@@ -10,14 +10,6 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.17"
     }
-    helm = {
-      source  = "hashicorp/helm"
-      version = ">= 2.8"
-    }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.14"
-    }
   }
 
   # ##  Used for end-to-end testing on project; update to suit your needs

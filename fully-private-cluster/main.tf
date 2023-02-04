@@ -133,7 +133,7 @@ module "vpc_endpoints" {
       replace(service, ".", "_") =>
       {
         service             = service
-        subnet_ids          = module.aws_vpc.private_subnets
+        subnet_ids          = module.vpc.private_subnets
         private_dns_enabled = true
         tags                = { Name = "${local.name}-${service}" }
       }

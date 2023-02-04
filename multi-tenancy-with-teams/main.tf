@@ -8,22 +8,6 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.this.token
 }
 
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.this.token
-  }
-}
-
-provider "kubectl" {
-  apply_retry_count      = 10
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  load_config_file       = false
-  token                  = data.aws_eks_cluster_auth.this.token
-}
-
 data "aws_eks_cluster_auth" "this" {
   name = module.eks.cluster_name
 }
@@ -32,7 +16,7 @@ data "aws_availability_zones" "available" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  name   = basename(path.cwd)
+  name   = "multi-tenant"
   region = "us-west-2"
 
   vpc_cidr = "10.0.0.0/16"
@@ -78,6 +62,13 @@ module "eks" {
     }
   }
 
+  manage_aws_auth_configmap = true
+  aws_auth_roles = flatten([
+    module.admin_team.aws_auth_configmap_role,
+    module.red_team.aws_auth_configmap_role,
+    [for team in module.blue_teams : team.aws_auth_configmap_role],
+  ])
+
   tags = local.tags
 }
 
@@ -85,59 +76,168 @@ module "eks" {
 # Teams
 ################################################################################
 
-# TODO - need to update and tie into EKS module
-module "teams" {
-  source = "./modules/aws-eks-teams"
+module "admin_team" {
+  source = "../modules/kubernetes-team"
 
-  platform_teams = {
-    admin = {
-      users = [data.aws_caller_identity.current.arn]
+  name = "admin-team"
+
+  enable_admin = true
+  users        = [data.aws_caller_identity.current.arn]
+  cluster_arn  = module.eks.cluster_arn
+
+  tags = local.tags
+}
+
+module "red_team" {
+  source = "../modules/kubernetes-team"
+
+  name = "red-team"
+
+  users             = [data.aws_caller_identity.current.arn]
+  cluster_arn       = module.eks.cluster_arn
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  labels = {
+    team = "red"
+  }
+
+  annotations = {
+    team = "red"
+  }
+
+  namespaces = {
+    default = {
+      # Provides access to an existing namespace
+      create = false
+    }
+    red = {
+      labels = {
+        projectName = "project-red",
+      }
+
+      resource_quota = {
+        hard = {
+          "requests.cpu"    = "1000m",
+          "requests.memory" = "4Gi",
+          "limits.cpu"      = "2000m",
+          "limits.memory"   = "8Gi",
+          "pods"            = "10",
+          "secrets"         = "10",
+          "services"        = "10"
+        }
+      }
+
+      limit_range = {
+        limit = [
+          {
+            type = "Pod"
+            max = {
+              cpu    = "200m"
+              memory = "1Gi"
+            }
+          },
+          {
+            type = "PersistentVolumeClaim"
+            min = {
+              storage = "24M"
+            }
+          },
+          {
+            type = "Container"
+            default = {
+              cpu    = "50m"
+              memory = "24Mi"
+            }
+          }
+        ]
+      }
+
+      network_policy = {
+        pod_selector = {
+          match_expressions = [{
+            key      = "name"
+            operator = "In"
+            values   = ["webfront", "api"]
+          }]
+        }
+
+        ingress = [{
+          ports = [
+            {
+              port     = "http"
+              protocol = "TCP"
+            },
+            {
+              port     = "53"
+              protocol = "TCP"
+            },
+            {
+              port     = "53"
+              protocol = "UDP"
+            }
+          ]
+
+          from = [
+            {
+              namespace_selector = {
+                match_labels = {
+                  name = "default"
+                }
+              }
+            },
+            {
+              ip_block = {
+                cidr = "10.0.0.0/8"
+                except = [
+                  "10.0.0.0/24",
+                  "10.0.1.0/24",
+                ]
+              }
+            }
+          ]
+        }]
+
+        egress = [] # single empty rule to allow all egress traffic
+
+        policy_types = ["Ingress", "Egress"]
+      }
     }
   }
 
-  # EKS Teams
-  application_teams = {
-    team-red = {
-      "labels" = {
-        "appName"     = "read-team-app",
-        "projectName" = "project-red",
-        "environment" = "example",
-        "domain"      = "example",
-        "uuid"        = "example",
-        "billingCode" = "example",
-        "branch"      = "example"
-      }
-      "quota" = {
-        "requests.cpu"    = "1000m",
-        "requests.memory" = "4Gi",
-        "limits.cpu"      = "2000m",
-        "limits.memory"   = "8Gi",
-        "pods"            = "10",
-        "secrets"         = "10",
-        "services"        = "10"
+  tags = local.tags
+}
+
+module "blue_teams" {
+  source = "../modules/kubernetes-team"
+
+  for_each = {
+    one = {}
+    two = {}
+  }
+  name = "blue-team-${each.key}"
+
+  users             = [data.aws_caller_identity.current.arn]
+  cluster_arn       = module.eks.cluster_arn
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  namespaces = {
+    "blue-${each.key}" = {
+      labels = {
+        appName     = "blue-team-app",
+        projectName = "project-blue",
       }
 
-      manifests_dir = "./manifests-team-red"
-      users         = [data.aws_caller_identity.current.arn]
-    }
-
-    team-blue = {
-      "labels" = {
-        "appName"     = "blue-team-app",
-        "projectName" = "project-blue",
+      resource_quota = {
+        hard = {
+          "requests.cpu"    = "2000m",
+          "requests.memory" = "4Gi",
+          "limits.cpu"      = "4000m",
+          "limits.memory"   = "16Gi",
+          "pods"            = "20",
+          "secrets"         = "20",
+          "services"        = "20"
+        }
       }
-      "quota" = {
-        "requests.cpu"    = "2000m",
-        "requests.memory" = "4Gi",
-        "limits.cpu"      = "4000m",
-        "limits.memory"   = "16Gi",
-        "pods"            = "20",
-        "secrets"         = "20",
-        "services"        = "20"
-      }
-
-      manifests_dir = "./manifests-team-blue"
-      users         = [data.aws_caller_identity.current.arn]
     }
   }
 

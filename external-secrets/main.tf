@@ -91,7 +91,7 @@ module "eks" {
 ################################################################################
 
 module "eks_blueprints_kubernetes_addons" {
-  source = "./modules/kubernetes-addons"
+  source = "../modules/kubernetes-addons"
 
   eks_cluster_id       = module.eks.cluster_name
   eks_cluster_endpoint = module.eks.cluster_endpoint
@@ -152,13 +152,13 @@ resource "aws_kms_key" "secrets" {
 }
 
 module "cluster_secretstore_role" {
-  source                      = "../../modules/irsa"
+  source                      = "../modules/irsa"
   kubernetes_namespace        = local.namespace
   create_kubernetes_namespace = false
   kubernetes_service_account  = local.cluster_secretstore_sa
   irsa_iam_policies           = [aws_iam_policy.cluster_secretstore.arn]
-  eks_cluster_id              = module.eks_blueprints.eks_cluster_id
-  eks_oidc_provider_arn       = module.eks_blueprints.eks_oidc_provider_arn
+  eks_cluster_id              = module.eks.cluster_name
+  eks_oidc_provider_arn       = module.eks.oidc_provider_arn
 
   depends_on = [module.eks_blueprints_kubernetes_addons]
 }
@@ -248,13 +248,13 @@ YAML
 #---------------------------------------------------------------
 
 module "secretstore_role" {
-  source                      = "../../modules/irsa"
+  source                      = "../modules/irsa"
   kubernetes_namespace        = local.namespace
   create_kubernetes_namespace = false
   kubernetes_service_account  = local.secretstore_sa
   irsa_iam_policies           = [aws_iam_policy.secretstore.arn]
-  eks_cluster_id              = module.eks_blueprints.eks_cluster_id
-  eks_oidc_provider_arn       = module.eks_blueprints.eks_oidc_provider_arn
+  eks_cluster_id              = module.eks.cluster_name
+  eks_oidc_provider_arn       = module.eks.oidc_provider_arn
   depends_on                  = [module.eks_blueprints_kubernetes_addons]
 }
 

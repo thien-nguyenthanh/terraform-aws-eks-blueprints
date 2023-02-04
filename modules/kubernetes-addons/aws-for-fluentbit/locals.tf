@@ -1,12 +1,12 @@
 locals {
-  name            = "aws-for-fluent-bit"
-  log_group_name  = var.cw_log_group_name == null ? "/${var.addon_context.eks_cluster_id}/worker-fluentbit-logs" : var.cw_log_group_name
-  service_account = try(var.helm_config.service_account, "${local.name}-sa")
+  name                 = "aws-for-fluent-bit"
+  log_group_name       = var.cw_log_group_name == null ? "/${var.addon_context.eks_cluster_id}/worker-fluentbit-logs" : var.cw_log_group_name
+  service_account_name = try(var.helm_config.service_account, "${local.name}-sa")
 
   set_values = [
     {
       name  = "serviceAccount.name"
-      value = local.service_account
+      value = local.service_account_name
     },
     {
       name  = "serviceAccount.create"
@@ -31,20 +31,20 @@ locals {
   )
 
   default_helm_values = [templatefile("${path.module}/values.yaml", {
-    aws_region      = var.addon_context.aws_region_name,
-    log_group_name  = local.log_group_name,
-    service_account = local.service_account
+    aws_region           = var.addon_context.aws_region_name,
+    log_group_name       = local.log_group_name,
+    service_account_name = local.service_account_name
   })]
 
   argocd_gitops_config = {
     enable             = true
     logGroupName       = local.log_group_name
-    serviceAccountName = local.service_account
+    serviceAccountName = local.service_account_name
   }
 
   irsa_config = {
     kubernetes_namespace                = local.helm_config["namespace"]
-    kubernetes_service_account          = local.service_account
+    kubernetes_service_account          = local.service_account_name
     create_kubernetes_namespace         = try(local.helm_config["create_namespace"], true)
     create_kubernetes_service_account   = true
     create_service_account_secret_token = try(local.helm_config["create_service_account_secret_token"], false)

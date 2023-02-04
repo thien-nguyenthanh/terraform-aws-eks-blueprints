@@ -147,6 +147,6 @@ First, we need to ensure that the ArgoCD applications are properly cleaned up fr
 Then you can start delete the terraform resources:
 ```sh
 terraform destroy -target=module.eks_blueprints_kubernetes_addons -auto-approve
-terraform destroy -target=module.eks_blueprints -auto-approve
+terraform destroy -target=module.eks -auto-approve
 terraform destroy -auto-approve
 ````

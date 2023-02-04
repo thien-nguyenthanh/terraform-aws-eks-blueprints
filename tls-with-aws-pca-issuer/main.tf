@@ -54,7 +54,7 @@ module "eks" {
   version = "~> 19.5"
 
   cluster_name                   = local.name
-  cluster_version                = local.cluster_version
+  cluster_version                = "1.24"
   cluster_endpoint_public_access = true
 
   # EKS Addons
@@ -85,7 +85,7 @@ module "eks" {
 ################################################################################
 
 module "eks_blueprints_kubernetes_addons" {
-  source = "./modules/kubernetes-addons"
+  source = "../modules/kubernetes-addons"
 
   eks_cluster_id       = module.eks.cluster_name
   eks_cluster_endpoint = module.eks.cluster_endpoint
@@ -96,7 +96,7 @@ module "eks_blueprints_kubernetes_addons" {
   enable_cert_manager            = true
   enable_cert_manager_csi_driver = true
   enable_aws_privateca_issuer    = true
-  aws_privateca_acmca_arn        = aws_acmpca_certificate_authority.example.arn
+  aws_privateca_acmca_arn        = aws_acmpca_certificate_authority.this.arn
 
   tags = local.tags
 }
@@ -115,7 +115,7 @@ resource "aws_acmpca_certificate_authority" "this" {
     signing_algorithm = "SHA512WITHRSA"
 
     subject {
-      common_name = "example.com"
+      common_name = var.certificate_dns
     }
   }
 
@@ -127,7 +127,7 @@ resource "aws_acmpca_certificate" "this" {
   certificate_signing_request = aws_acmpca_certificate_authority.this.certificate_signing_request
   signing_algorithm           = "SHA512WITHRSA"
 
-  template_arn = "arn:${data.aws_partition.current.partition}:acm-pca:::template/RootCACertificate/V1"
+  template_arn = "arn:aws:acm-pca:::template/RootCACertificate/V1"
 
   validity {
     type  = "YEARS"
@@ -153,7 +153,7 @@ resource "kubectl_manifest" "cluster_pca_issuer" {
     kind       = "AWSPCAClusterIssuer"
 
     metadata = {
-      name = module.eks_blueprints.eks_cluster_id
+      name = module.eks.cluster_name
     }
 
     spec = {
@@ -173,7 +173,7 @@ resource "kubectl_manifest" "cluster_pca_issuer" {
 #-------------------------------
 
 # Using kubectl to workaround kubernetes provider issue https://github.com/hashicorp/terraform-provider-kubernetes/issues/1453
-resource "kubectl_manifest" "example_pca_certificate" {
+resource "kubectl_manifest" "pca_certificate" {
   yaml_body = yamlencode({
     apiVersion = "cert-manager.io/v1"
     kind       = "Certificate"
@@ -189,7 +189,7 @@ resource "kubectl_manifest" "example_pca_certificate" {
       issuerRef = {
         group = "awspca.cert-manager.io"
         kind  = "AWSPCAClusterIssuer"
-        name : module.eks_blueprints.eks_cluster_id
+        name : module.eks.cluster_name
       }
       renewBefore = "360h0m0s"
       secretName  = join("-", [var.certificate_name, "clusterissuer"]) # This is the name with which the K8 Secret will be available

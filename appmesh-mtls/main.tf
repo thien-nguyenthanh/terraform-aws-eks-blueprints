@@ -54,7 +54,7 @@ module "eks" {
   version = "~> 19.5"
 
   cluster_name                   = local.name
-  cluster_version                = local.cluster_version
+  cluster_version                = "1.24"
   cluster_endpoint_public_access = true
 
   # EKS Addons
@@ -85,7 +85,7 @@ module "eks" {
 ################################################################################
 
 module "eks_blueprints_kubernetes_addons" {
-  source = "./modules/kubernetes-addons"
+  source = "../modules/kubernetes-addons"
 
   eks_cluster_id       = module.eks.cluster_name
   eks_cluster_endpoint = module.eks.cluster_endpoint
@@ -144,7 +144,7 @@ resource "kubectl_manifest" "cluster_pca_issuer" {
     kind       = "AWSPCAClusterIssuer"
 
     metadata = {
-      name = module.eks_blueprints.eks_cluster_id
+      name = module.eks.cluster_name
     }
 
     spec = {
@@ -172,7 +172,7 @@ resource "kubectl_manifest" "pca_certificate" {
       issuerRef = {
         group = "awspca.cert-manager.io"
         kind  = "AWSPCAClusterIssuer"
-        name : module.eks_blueprints.eks_cluster_id
+        name : module.eks.cluster_name
       }
       renewBefore = "360h0m0s"
       # This is the name with which the K8 Secret will be available
