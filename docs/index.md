@@ -1,10 +1,6 @@
 # Amazon EKS Blueprints for Terraform
 
-![GitHub](https://img.shields.io/github/license/aws-ia/terraform-aws-eks-blueprints)
-
-Welcome to Amazon EKS Blueprints for Terraform!
-
-This repository contains a collection of Terraform modules that aim to make it easier and faster for customers to adopt [Amazon EKS](https://aws.amazon.com/eks/).
+This repository contains a collection of Terraform examples that aim to make it easier and faster for customers to adopt [Amazon EKS](https://aws.amazon.com/eks/).
 
 ## What is EKS Blueprints
 
@@ -12,15 +8,9 @@ EKS Blueprints helps you compose complete EKS clusters that are fully bootstrapp
 
 You can use EKS Blueprints to easily bootstrap an EKS cluster with Amazon EKS add-ons as well as a wide range of popular open-source add-ons, including Prometheus, Karpenter, Nginx, Traefik, AWS Load Balancer Controller, Fluent Bit, Keda, ArgoCD, and more. EKS Blueprints also helps you implement relevant security controls needed to operate workloads from multiple teams in the same cluster.
 
-## Examples
-
-To view a library of examples for how you can leverage `terraform-aws-eks-blueprints`, please see our [examples](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/main/examples).
-
 ## Workshop
+
 We maintain a hands-on self-paced workshop, the [EKS Blueprints for Terraform workshop](https://catalog.workshops.aws/eks-blueprints-terraform/en-US) helps you with foundational setup of your EKS cluster, and it gradually adds complexity via existing and new modules.
-
-![EKS Blueprints for Terraform](https://static.us-east-1.prod.workshops.aws/public/6ad9b13b-df6a-4609-a586-fd2b7f25863c/static/eks_cluster_1.svg)
-
 
 ## Motivation
 

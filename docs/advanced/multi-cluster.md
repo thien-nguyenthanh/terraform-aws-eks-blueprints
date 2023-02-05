@@ -34,19 +34,20 @@ e.g. folder/file structure for defining multiple clusters
         │                       └── variables.tf
         │                       └── outputs.tf
 
-
 ## Important Note
 
 If you are using an existing VPC, you need to ensure that the following tags are added to the VPC and subnet resources
 
 Add Tags to **VPC**
-```hcl
+
+```terraform
     Key = "Kubernetes.io/cluster/${local.cluster_id}"
     Value = "Shared"
 ```
 
 Add Tags to **Public Subnets tagging** requirement
-```hcl
+
+```terraform
     public_subnet_tags = {
       "Kubernetes.io/cluster/${local.cluster_id}" = "shared"
       "Kubernetes.io/role/elb"                      = "1"
@@ -54,7 +55,8 @@ Add Tags to **Public Subnets tagging** requirement
 ```
 
 Add Tags to **Private Subnets tagging** requirement
-```hcl
+
+```terraform
     private_subnet_tags = {
       "Kubernetes.io/cluster/${local.cluster_id}" = "shared"
       "Kubernetes.io/role/internal-elb"             = "1"

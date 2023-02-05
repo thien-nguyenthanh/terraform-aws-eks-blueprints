@@ -1,25 +1,79 @@
+site_author: Amazon Web Services
 site_name: Amazon EKS Blueprints for Terraform
+site_description: Configure and deploy complete Amazon EKS clusters
+copyright: 'Copyright &copy; Amazon 2023'
 repo_name: "aws-ia/terraform-aws-eks-blueprints"
 repo_url: "https://github.com/aws-ia/terraform-aws-eks-blueprints"
 edit_uri: "edit/main/docs/"
-docs_dir: "docs"
+
+nav:
+  - Getting Started:
+    - Overview: index.md
+    - Core Concepts: getting-started/core-concepts.md
+    - FAQ: getting-started/faq.md
+    - Adopters: getting-started/adopters.md
+  - Configuration:
+    - Extensibility: configuration/extensibility.md
+    - Teams: configuration/teams.md
+    - IAM: configuration/iam-permissions.md
+  - Advanced:
+    - Bottlerocket: advanced/bottlerocket.md
+    - Cluster Upgrades: advanced/cluster-upgrades.md
+    - GitOps with Flux: advanced/gitops-with-flux.md
+    - Multi-cluster: advanced/multi-cluster.md
+    - Private Clusters: advanced/private-clusters.md
+
 theme:
   name: material
+  logo: imgs/aws-logo.svg
+  favicon: imgs/aws-logo.svg
+  palette:
+    primary: blue
+    accent: deep purple
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
   features:
-    - tabs
+    - navigation.tabs
+    - navigation.tabs.sticky
+  highlightjs: true
+  hljs_languages:
+      - yaml
+      - terraform
+
 markdown_extensions:
-  - def_list
-  - pymdownx.highlight
-  - pymdownx.superfences
+  - admonition
+  - codehilite
+  - footnotes
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.tasklist:
-      custom_checkbox: true
+  - pymdownx.snippets
+  - pymdownx.superfences
   - toc:
       permalink: true
+
 plugins:
-  - search
+  - search:
+      lang:
+        - en
   - awesome-pages
   - include-markdown
+
 extra:
   version:
     provider: mike

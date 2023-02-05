@@ -15,7 +15,7 @@ The current version of the upgrade documentation while writing this [README](htt
 
 1. Change the version in Terraform to the desired Kubernetes cluster version. See the example below
 
-   ```hcl-terraform
+   ```terraform
    cluster_version      = "1.21"
    ```
 
@@ -23,7 +23,7 @@ The current version of the upgrade documentation while writing this [README](htt
 
 To ensure the correct addon version is used, it is recommended to use the addon version data source which will pull the appropriate version for a given cluster version:
 
-```hcl-terraform
+```terraform
 module "eks_blueprints_kubernetes_addons" {
   # Essential inputs are not shown for brevity
 
@@ -50,9 +50,10 @@ module "eks_blueprints_kubernetes_addons" {
 ```
 
 3. Apply the changes to the cluster with Terraform. This will:
-  - Upgrade the Control Plane to the version specified
-  - Update the Data Plane to ensure the compute resources are utilizing the corresponding AMI for the given cluster version
-  - Update addons to reflect the respective versions
+
+- Upgrade the Control Plane to the version specified
+- Update the Data Plane to ensure the compute resources are utilizing the corresponding AMI for the given cluster version
+- Update addons to reflect the respective versions
 
 ## Important Note
 

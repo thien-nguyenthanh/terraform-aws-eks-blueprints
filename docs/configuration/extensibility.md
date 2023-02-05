@@ -51,7 +51,7 @@ There are two ways in which a customer can implement fully private add-ons:
 
 The following example shows you can leverage EKS Blueprints to provide your own helm add-on.
 
-```hcl
+```terraform
 #---------------------------------------------------------------
 # AWS VPC CNI Metrics Helper
 # This is using local helm chart
@@ -203,7 +203,7 @@ If your add-on can be deployed via helm chart, we recommend the use of the [helm
 
 > main.tf
 
-```hcl
+```terraform
 module "helm_addon" {
   source               = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons/helm-addon?ref=v3.5.0"
   manage_via_gitops    = var.manage_via_gitops
@@ -222,7 +222,7 @@ Once you have tested your add-on locally against your fork of the core repo, ple
 
 > Update to [`kubernetes-addons/main.tf`](https://github.com/aws-ia/terraform-aws-eks-blueprints/blob/main/modules/kubernetes-addons/main.tf) with a code block that invokes your add-on. E.g.
 
-```hcl
+```terraform
 module "kube_state_metrics" {
   count                     = var.enable_kube_state_metrics ? 1 : 0
   source                    = "askulkarni2/kube-state-metrics-addon/eksblueprints"
@@ -235,7 +235,7 @@ module "kube_state_metrics" {
 
 > Update to [`kubernetes-addons/variables.tf`](https://github.com/aws-ia/terraform-aws-eks-blueprints/blob/main/modules/kubernetes-addons/variables.tf) to accept parameters for your add-on. E.g.
 
-```hcl
+```terraform
 #-----------Kube State Metrics ADDON-------------
 variable "enable_kube_state_metrics" {
   type        = bool
@@ -260,7 +260,7 @@ If your add-on can be managed via ArgoCD GitOps, then
 
 > outputs.tf
 
-```hcl
+```terraform
 output "argocd_gitops_config" {
   description = "Configuration used for managing the add-on with ArgoCD"
   value       = var.manage_via_gitops ? local.argocd_gitops_config : null

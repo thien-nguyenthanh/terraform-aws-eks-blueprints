@@ -1,24 +1,8 @@
 # Amazon EKS Blueprints for Terraform
 
-Welcome to Amazon EKS Blueprints for Terraform!
-
-This repository contains a collection of Terraform modules that aim to make it easier and faster for customers to adopt [Amazon EKS](https://aws.amazon.com/eks/). It can be used by AWS customers, partners, and internal AWS teams to configure and manage complete EKS clusters that are fully bootstrapped with the operational software that is needed to deploy and operate workloads.
-
 ## Getting Started
 
 The easiest way to get started with EKS Blueprints is to follow our [Getting Started guide](https://aws-ia.github.io/terraform-aws-eks-blueprints/latest/getting-started/).
-
-## Add-ons
-
-EKS Blueprints makes it easy to provision a wide range of popular Kubernetes add-ons into an EKS cluster. By default, the [Terraform Helm provider](https://github.com/hashicorp/terraform-provider-helm) is used to deploy add-ons with publicly available [Helm Charts](https://artifacthub.io/).EKS Blueprints provides support for leveraging self-hosted Helm Chart as well.
-
-For complete documentation on deploying add-ons, please visit our [add-on documentation](https://aws-ia.github.io/terraform-aws-eks-blueprints/latest/add-ons/)
-
-## Motivation
-
-Kubernetes is a powerful and extensible container orchestration technology that allows you to deploy and manage containerized applications at scale. The extensible nature of Kubernetes also allows you to use a wide range of popular open-source tools, commonly referred to as add-ons, in Kubernetes clusters. With such a large number of tooling and design choices available however, building a tailored EKS cluster that meets your application’s specific needs can take a significant amount of time. It involves integrating a wide range of open-source tools and AWS services and requires deep expertise in AWS and Kubernetes.
-
-AWS customers have asked for examples that demonstrate how to integrate the landscape of Kubernetes tools and make it easy for them to provision complete, opinionated EKS clusters that meet specific application requirements. Customers can use EKS Blueprints to configure and deploy purpose built EKS clusters, and start onboarding workloads in days, rather than months.
 
 ## Support & Feedback
 

@@ -20,7 +20,7 @@ To overcome this limitation, you can add/enable `manifests_dir` after you applie
 
 #### Application Team Example
 
-```hcl
+```terraform
   # EKS Application Teams
 
   application_teams = {
@@ -89,7 +89,7 @@ To create an `Platform Team` for your cluster, simply use `platform_teams`. You 
 
 #### Platform Team Example
 
-```hcl
+```terraform
   platform_teams = {
     admin-team-name-example = {
       users = [
