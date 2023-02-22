@@ -77,7 +77,7 @@ module "eks" {
 ################################################################################
 
 module "admin_team" {
-  source = "../modules/kubernetes-team"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   name = "admin-team"
 
@@ -89,7 +89,7 @@ module "admin_team" {
 }
 
 module "red_team" {
-  source = "../modules/kubernetes-team"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   name = "red-team"
 
@@ -208,7 +208,7 @@ module "red_team" {
 }
 
 module "blue_teams" {
-  source = "../modules/kubernetes-team"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   for_each = {
     one = {}
