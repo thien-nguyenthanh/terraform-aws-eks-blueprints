@@ -128,13 +128,39 @@ rules:
 - apiGroups:
   - ray.io
   resources:
-  - rayclusters/finalizer
+  - rayclusters/finalizers
   verbs:
   - update
 - apiGroups:
   - ray.io
   resources:
   - rayclusters/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ray.io
+  resources:
+  - rayjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ray.io
+  resources:
+  - rayjobs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ray.io
+  resources:
+  - rayjobs/status
   verbs:
   - get
   - patch
@@ -186,46 +212,11 @@ rules:
   - list
   - update
   - watch
+{{- if .Values.batchScheduler.enabled }}
 - apiGroups:
-  - ray.io
+  - scheduling.volcano.sh
   resources:
-  - rayjobs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ray.io
-  resources:
-  - rayjobs/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - ray.io
-  resources:
-  - rayjobs/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - rolebindings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - roles
+  - podgroups
   verbs:
   - create
   - delete
@@ -233,4 +224,11 @@ rules:
   - list
   - update
   - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+{{- end }}
 {{- end }}
